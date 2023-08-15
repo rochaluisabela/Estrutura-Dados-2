@@ -1,1 +1,89 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+class Aluno {
+public:
+    int id;
+    std::string nome;
+
+    Aluno(int _id, const std::string& _nome) : id(_id), nome(_nome) {}
+
+    bool podeMatricular() {
+        // Implementar lógica para verificar se o aluno pode se matricular
+        return true;
+    }
+};
+
+class Disciplina {
+private:
+    int id;
+    std::string descricao;
+    std::vector<Aluno> alunos;
+
+public:
+    Disciplina(int _id, const std::string& _descricao) : id(_id), descricao(_descricao) {}
+
+    bool matricularAluno(const Aluno& aluno) {
+        // Implementar lógica para matricular o aluno na disciplina
+        return true;
+    }
+
+    bool desmatricularAluno(const Aluno& aluno) {
+        // Implementar lógica para desmatricular o aluno da disciplina
+        return true;
+    }
+};
+
+class Curso {
+private:
+    int id;
+    std::string descricao;
+    std::vector<Disciplina> disciplinas;
+
+public:
+    Curso(int _id, const std::string& _descricao) : id(_id), descricao(_descricao) {}
+
+    bool adicionarDisciplina(const Disciplina& disciplina) {
+        // Implementar lógica para adicionar disciplina ao curso
+        return true;
+    }
+
+    Disciplina pesquisarDisciplina(const Disciplina& disciplina) {
+        // Implementar lógica para pesquisar disciplina no curso
+        return disciplina;
+    }
+
+    bool removerDisciplina(const Disciplina& disciplina) {
+        // Implementar lógica para remover disciplina do curso
+        return true;
+    }
+};
+
+class Escola {
+private:
+    std::vector<Curso> cursos;
+
+public:
+    bool adicionarCurso(const Curso& curso) {
+        // Implementar lógica para adicionar curso à escola
+        return true;
+    }
+
+    Curso pesquisarCurso(const Curso& curso) {
+        // Implementar lógica para pesquisar curso na escola
+        return curso;
+    }
+
+    bool removerCurso(const Curso& curso) {
+        // Implementar lógica para remover curso da escola
+        return true;
+    }
+};
+
+int main() {
+    // Implementar o loop do menu aqui
+
+    return 0;
+}
 

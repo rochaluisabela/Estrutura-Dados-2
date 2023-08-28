@@ -1,215 +1,316 @@
 #Aluna Isabela Rocha CB3021599
 
-#include <iostream>
-#include <string>
-using namespace std;
+using System;
 
-class Venda {
-private:
-    int qtde;
-    double valor;
+class Venda
+{
+    private int qtde;
+    private double valor;
 
-public:
-    Venda(int qtde, double valor) : qtde(qtde), valor(valor) {}
+    public Venda(int qtde, double valor)
+    {
+        this.qtde = qtde;
+        this.valor = valor;
+    }
 
-    double valorMedio() {
+    public double ValorMedio()
+    {
         return valor / qtde;
     }
-};
+}
 
-class Vendedor {
-private:
-    int id;
-    string nome;
-    double percComissao;
-    Venda asVendas[31];
+class Vendedor
+{
+    private int id;
+    private string nome;
+    private double percComissao;
+    private Venda[] asVendas;
 
-public:
-    Vendedor(int id, string nome, double percComissao) : id(id), nome(nome), percComissao(percComissao) {}
+    private int vendasRegistradas = 0;
 
-    void registrarVenda(int dia, Venda venda) {
-        asVendas[dia] = venda;
+    public Vendedor(int id, string nome, double percComissao)
+    {
+        this.id = id;
+        this.nome = nome;
+        this.percComissao = percComissao;
+        this.asVendas = new Venda[31];
     }
 
-    double valorVendas() {
+    public void RegistrarVenda(int dia, Venda venda)
+    {
+        asVendas[dia - 1] = venda;
+        vendasRegistradas++;
+    }
+
+    public double ValorVendas()
+    {
         double total = 0;
-        for (const auto& venda : asVendas) {
-            total += venda.valor;
+        foreach (Venda venda in asVendas)
+        {
+            if (venda != null)
+            {
+                total += venda.ValorMedio();
+            }
         }
         return total;
     }
 
-    double valorComissao() {
-        return valorVendas() * (percComissao / 100);
-    }
-};
-
-class Vendedores {
-private:
-    Vendedor osVendedores[10];
-    int max;
-    int qtde;
-
-public:
-    Vendedores() : max(10), qtde(0) {}
-
-    bool addVendedor(Vendedor v) {
-        if (qtde >= max) {
-            cout << "Não é possível adicionar mais vendedores. Limite atingido." << endl;
-            return false;
-        }
-        osVendedores[qtde++] = v;
-        return true;
+    public double ValorComissao()
+    {
+        return ValorVendas() * percComissao;
     }
 
-    bool delVendedor(Vendedor v) {
-        if (v.valorVendas() > 0) {
-            cout << "Não é possível excluir o vendedor. Existem vendas associadas a ele." << endl;
-            return false;
+    public bool TemVendasRegistradas()
+    {
+        return vendasRegistradas > 0;
+    }
+}
+
+class Vendedores
+{
+    private Vendedor[] osVendedores;
+    private int max;
+    private int qtde;
+
+    public Vendedores(int max)
+    {
+        this.max = max;
+        this.osVendedores = new Vendedor[max];
+    }
+
+    public bool AddVendedor(Vendedor v)
+    {
+        if (qtde < max)
+        {
+            osVendedores[qtde] = v;
+            qtde++;
+            return true;
         }
-        int i = 0;
-        while (i < qtde) {
-            if (osVendedores[i].id == v.id) {
-                for (int j = i; j < qtde - 1; j++) {
-                    osVendedores[j] = osVendedores[j + 1];
-                }
-                qtde--;
-                return true;
-            }
-            i++;
-        }
-        cout << "Vendedor não encontrado." << endl;
         return false;
     }
 
-    Vendedor searchVendedor(Vendedor v) {
-        for (int i = 0; i < qtde; i++) {
-            if (osVendedores[i].id == v.id) {
-                return osVendedores[i];
+    public bool DelVendedor(Vendedor v)
+    {
+        if (v.TemVendasRegistradas())
+        {
+            return false;
+        }
+
+        for (int i = 0; i < qtde; i++)
+        {
+            if (osVendedores[i] == v)
+            {
+                osVendedores[i] = osVendedores[qtde - 1];
+                osVendedores[qtde - 1] = null;
+                qtde--;
+                return true;
             }
         }
-        return Vendedor(-1, "", 0);
+        return false;
     }
 
-    void listarVendedores() {
-        double totalVendas = 0;
-        double totalComissao = 0;
-        for (int i = 0; i < qtde; i++) {
-            Vendedor v = osVendedores[i];
-            cout << "Id: " << v.id << endl;
-            cout << "Nome: " << v.nome << endl;
-            cout << "Valor total das vendas: R$" << v.valorVendas() << endl;
-            cout << "Valor da comissão devida: R$" << v.valorComissao() << endl;
-            cout << endl;
-            totalVendas += v.valorVendas();
-            totalComissao += v.valorComissao();
+    public Vendedor SearchVendedor(Vendedor v)
+    {
+        foreach (Vendedor vend in osVendedores)
+        {
+            if (vend == v)
+            {
+                return vend;
+            }
         }
-        cout << "Total de vendas: R$" << totalVendas << endl;
-        cout << "Total de comissão devida: R$" << totalComissao << endl;
+        return null;
     }
-};
 
-int main() {
-    Vendedores vendedores;
-    int opcao;
-
-    do {
-        cout << "OPÇÕES:" << endl;
-        cout << "0. Sair" << endl;
-        cout << "1. Cadastrar vendedor" << endl;
-        cout << "2. Consultar vendedor" << endl;
-        cout << "3. Excluir vendedor" << endl;
-        cout << "4. Registrar venda" << endl;
-        cout << "5. Listar vendedores" << endl;
-        cout << "Digite a opção desejada: ";
-        cin >> opcao;
-
-        switch (opcao) {
-        case 0:
-            cout << "Encerrando o programa." << endl;
-            break;
-
-        case 1: {
-            int id;
-            string nome;
-            double percComissao;
-            cout << "Digite o id do vendedor: ";
-            cin >> id;
-            cout << "Digite o nome do vendedor: ";
-            cin.ignore();
-            getline(cin, nome);
-            cout << "Digite a porcentagem de comissão do vendedor: ";
-            cin >> percComissao;
-            Vendedor vendedor(id, nome, percComissao);
-            if (vendedores.addVendedor(vendedor)) {
-                cout << "Vendedor cadastrado com sucesso." << endl;
+    public double ValorVendas()
+    {
+        double total = 0;
+        foreach (Vendedor vendedor in osVendedores)
+        {
+            if (vendedor != null)
+            {
+                total += vendedor.ValorVendas();
             }
-            break;
         }
+        return total;
+    }
 
-        case 2: {
-            int id;
-            cout << "Digite o id do vendedor que deseja consultar: ";
-            cin >> id;
-            Vendedor vendedor = vendedores.searchVendedor(Vendedor(id, "", 0));
-            if (vendedor.id == -1) {
-                cout << "Vendedor não encontrado." << endl;
-            } else {
-                cout << "Id: " << vendedor.id << endl;
-                cout << "Nome: " << vendedor.nome << endl;
-                cout << "Valor total das vendas: R$" << vendedor.valorVendas() << endl;
-                cout << "Valor da comissão devida: R$" << vendedor.valorComissao() << endl;
-                cout << "Valor médio das vendas diárias: R$" << vendedor.valorVendas() / 31.0 << endl;
+    public double ValorComissao()
+    {
+        double total = 0;
+        foreach (Vendedor vendedor in osVendedores)
+        {
+            if (vendedor != null)
+            {
+                total += vendedor.ValorComissao();
             }
-            break;
         }
+        return total;
+    }
+}
 
-        case 3: {
-            int id;
-            cout << "Digite o id do vendedor que deseja excluir: ";
-            cin >> id;
-            Vendedor vendedor = vendedores.searchVendedor(Vendedor(id, "", 0));
-            if (vendedor.id == -1) {
-                cout << "Vendedor não encontrado." << endl;
-            } else {
-                if (vendedores.delVendedor(vendedor)) {
-                    cout << "Vendedor excluído com sucesso." << endl;
-                }
+class Program
+{
+    static void Main(string[] args)
+    {
+        Vendedores vendedores = new Vendedores(10);
+
+        while (true)
+        {
+            Console.WriteLine("OPÇÕES:");
+            Console.WriteLine("0. Sair");
+            Console.WriteLine("1. Cadastrar vendedor");
+            Console.WriteLine("2. Consultar vendedor");
+            Console.WriteLine("3. Excluir vendedor");
+            Console.WriteLine("4. Registrar venda");
+            Console.WriteLine("5. Listar vendedores");
+
+            int opcao = int.Parse(Console.ReadLine());
+
+            switch (opcao)
+            {
+                case 0:
+                    Console.WriteLine("Saindo...");
+                    return;
+                case 1:
+                    // Cadastrar vendedor
+                    Console.Write("Digite o ID do vendedor: ");
+                    int id = int.Parse(Console.ReadLine());
+                    Console.Write("Digite o nome do vendedor: ");
+                    string nome = Console.ReadLine();
+                    Console.Write("Digite a porcentagem de comissão: ");
+                    double comissao = double.Parse(Console.ReadLine());
+
+                    Vendedor novoVendedor = new Vendedor(id, nome, comissao);
+                    if (vendedores.AddVendedor(novoVendedor))
+                    {
+                        Console.WriteLine("Vendedor cadastrado com sucesso!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Não foi possível cadastrar o vendedor. Limite de vendedores atingido.");
+                    }
+                    break;
+                case 2:
+                    // Consultar vendedor
+                    Console.Write("Digite o ID do vendedor: ");
+                    int idConsulta = int.Parse(Console.ReadLine());
+                    Vendedor vendedorConsultado = null;
+
+                    foreach (Vendedor vendedor in vendedores)
+                    {
+                        if (vendedor != null && vendedor.Id == idConsulta)
+                        {
+                            vendedorConsultado = vendedor;
+                            break;
+                        }
+                    }
+
+                    if (vendedorConsultado != null)
+                    {
+                        Console.WriteLine($"ID: {vendedorConsultado.Id}");
+                        Console.WriteLine($"Nome: {vendedorConsultado.Nome}");
+                        Console.WriteLine($"Valor Total de Vendas: {vendedorConsultado.ValorVendas()}");
+                        Console.WriteLine($"Valor da Comissão Devida: {vendedorConsultado.ValorComissao()}");
+                        Console.WriteLine("Vendas diárias:");
+                        for (int dia = 1; dia <= 31; dia++)
+                        {
+                            Venda venda = vendedorConsultado.GetVenda(dia);
+                            if (venda != null)
+                            {
+                                Console.WriteLine($"Dia {dia}: Valor Médio: {venda.ValorMedio()}");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Vendedor não encontrado.");
+                    }
+                    break;
+                case 3:
+                    // Excluir vendedor
+                    Console.Write("Digite o ID do vendedor a ser excluído: ");
+                    int idExclusao = int.Parse(Console.ReadLine());
+                    Vendedor vendedorExclusao = null;
+
+                    foreach (Vendedor vendedor in vendedores)
+                    {
+                        if (vendedor != null && vendedor.Id == idExclusao)
+                        {
+                            vendedorExclusao = vendedor;
+                            break;
+                        }
+                    }
+
+                    if (vendedorExclusao != null)
+                    {
+                        if (vendedores.DelVendedor(vendedorExclusao))
+                        {
+                            Console.WriteLine("Vendedor excluído com sucesso!");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Não foi possível excluir o vendedor. Vendas associadas.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Vendedor não encontrado.");
+                    }
+                    break;
+                case 4:
+                    // Registrar venda
+                    Console.Write("Digite o ID do vendedor: ");
+                    int idVenda = int.Parse(Console.ReadLine());
+                    Vendedor vendedorVenda = null;
+
+                    foreach (Vendedor vendedor in vendedores)
+                    {
+                        if (vendedor != null && vendedor.Id == idVenda)
+                        {
+                            vendedorVenda = vendedor;
+                            break;
+                        }
+                    }
+
+                    if (vendedorVenda != null)
+                    {
+                        Console.Write("Digite o dia da venda: ");
+                        int diaVenda = int.Parse(Console.ReadLine());
+                        Console.Write("Digite a quantidade de vendas: ");
+                        int qtdeVendas = int.Parse(Console.ReadLine());
+                        Console.Write("Digite o valor total das vendas: ");
+                        double valorVendas = double.Parse(Console.ReadLine());
+
+                        Venda novaVenda = new Venda(qtdeVendas, valorVendas);
+                        vendedorVenda.RegistrarVenda(diaVenda, novaVenda);
+                        Console.WriteLine("Venda registrada com sucesso!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Vendedor não encontrado.");
+                    }
+                    break;
+                case 5:
+                    // Listar vendedores
+                    Console.WriteLine("Vendedores cadastrados:");
+                    foreach (Vendedor vendedor in vendedores)
+                    {
+                        if (vendedor != null)
+                        {
+                            Console.WriteLine($"ID: {vendedor.Id}");
+                            Console.WriteLine($"Nome: {vendedor.Nome}");
+                            Console.WriteLine($"Valor Total de Vendas: {vendedor.ValorVendas()}");
+                            Console.WriteLine($"Valor da Comissão Devida: {vendedor.ValorComissao()}");
+                            Console.WriteLine();
+                        }
+                    }
+                    Console.WriteLine($"Total de Vendas de Todos os Vendedores: {vendedores.ValorVendas()}");
+                    Console.WriteLine($"Total de Comissão Devida: {vendedores.ValorComissao()}");
+                    break;
+                default:
+                    Console.WriteLine("Opção inválida.");
+                    break;
             }
-            break;
         }
-
-        case 4: {
-            int id, dia, qtde;
-            double valor;
-            cout << "Digite o id do vendedor que realizou a venda: ";
-            cin >> id;
-            Vendedor vendedor = vendedores.searchVendedor(Vendedor(id, "", 0));
-            if (vendedor.id == -1) {
-                cout << "Vendedor não encontrado." << endl;
-            } else {
-                cout << "Digite o dia da venda: ";
-                cin >> dia;
-                cout << "Digite a quantidade de vendas realizadas: ";
-                cin >> qtde;
-                cout << "Digite o valor total das vendas: ";
-                cin >> valor;
-                Venda venda(qtde, valor);
-                vendedor.registrarVenda(dia, venda);
-                cout << "Venda registrada com sucesso." << endl;
-            }
-            break;
-        }
-
-        case 5:
-            vendedores.listarVendedores();
-            break;
-
-        default:
-            cout << "Opção inválida. Digite um número válido." << endl;
-            break;
-        }
-    } while (opcao != 0);
-
-    return 0;
+    }
 }
